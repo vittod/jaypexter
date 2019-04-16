@@ -1,0 +1,65 @@
+* {
+    font-family: 'Varela Round', sans-serif;
+}
+
+body {
+    margin: 0;
+}
+
+#main {
+
+}
+
+.logo h1, h2{
+    font-family: 'Exo 2', sans-serif;
+}
+
+.logo {
+    display: flex;
+    align-items: baseline;
+    background: #f6f5f5
+}
+.logo > *, .decription {
+    margin-left: 20px;
+}
+
+.description {
+    height: 3em;
+    background: #3bb4c1;
+    margin-top: 0;
+    display: flex;
+    padding-left: 20px;
+    margin-bottom: 2em;
+}
+
+
+#image-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 300px;
+    border: 1px solid black;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 10px;
+    background: #f6f5f5
+}
+.card-header {
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-header img {
+    height: 120%;
+}
+
+.card-footer {
+    margin: 5px;
+}

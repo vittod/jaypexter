@@ -1,10 +1,41 @@
 <!doctype html>
 <html>
 <head>
-    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Anton|Exo+2|Fjalla+One|Libre+Baskerville|Lobster|Pacifico|Varela+Round" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <title>jaypexter</title>
 </head>
 <body>
+
+    <div id="main">
+        <div class="logo">
+            <h1>jaypexter</h1>
+            <h2>...dot by dot</h2>
+        </div>
+
+        <div class="description" @click="morph">
+            <p>{{describer}}</p>
+        </div>
+
+
+        <div id="image-container">
+
+            <div class="card" v-for="image in images">
+                <div class="card-header">
+                    <img :src="image.url">
+                </div>
+                <div class="card-footer">
+                    <p>{{image.title}}</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
+    <script type="text/javascript" src="js/iBoard.js"></script>
 </body>
 </html>
