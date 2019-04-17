@@ -1,7 +1,5 @@
 const knox = require('knox-s3');
 const fs = require('fs');
-//const db = require('./db')
-
 
 let secrets;
 if (process.env.NODE_ENV == 'production') {

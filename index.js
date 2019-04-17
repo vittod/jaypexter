@@ -47,12 +47,10 @@ app.get('/getById/:id', (req, res) => {
 })
 
 app.post('/postImg', uploader.single('iFile'), s3.upload, (req, res) => {
-
     console.log('index', res.locals.newImg)
-
     if (req.file) {
         db.postNewImg(res.locals.newImg.url, res.locals.newImg.username, res.locals.newImg.title, res.locals.newImg.description)
-            then(dbEntry => {
+            .then(dbEntry => {
                 console.log(dbEntry);
                 res.json({
                     success: true,
@@ -64,6 +62,23 @@ app.post('/postImg', uploader.single('iFile'), s3.upload, (req, res) => {
             success: false
         });
     }
+})
+
+app.get('/getCommentsById/:id', (req, res) => {
+    console.log('index req', req.params.id);
+    db.getCommentsById(req.params.id)
+        .then(({rows}) => {
+            console.log('index rows', rows);
+            res.json(rows)
+        })
+})
+
+app.post('/postComment', (req, res) => {
+    console.log('index post', req.body);
+    db.postComment(req.body.id, req.body.username, req.body.comment)
+        .then(data => {
+            res.json(data)
+        })
 })
 
 

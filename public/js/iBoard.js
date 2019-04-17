@@ -1,37 +1,75 @@
 "use strict";
 
+    ////////////////////////////////// COMMENT /////////////////////////////
+
 Vue.component('comment', {
-    props: ['imgidgrnadchild'],
     template: '#comment-temp',
+    props: ['imgidgrnadchild', 'comment'],
     data: function() {
         return {}
     }
 })
 
+    ////////////////////////////////// MODAL /////////////////////////////
+
 Vue.component('img-modal', {
-    props: ['imgidchild'],
     template: '#modal-temp',
+    props: ['imgidchild'],
     data: function() {
         return {
             image: '',
             commentTxt: '',
-            username: ''
+            username: '',
+            cmtRes: []
         }
     },
     mounted: function() {
-        console.log('hello got here', this.imgidchild);
         axios.get('/getById/' + this.imgidchild)
             .then(function(resp) {
                 console.log('got back', resp.data[0]);
                 this.image = resp.data[0]
             }.bind(this));
+
+        this.getCommentsById(this.imgidchild);
+
         window.addEventListener('keydown', this.escapeListen.bind(this))
     },
     destroyed: function() {
+
+        ////////////////
+        ////////////////    does not remove listener ???
+        ////////////////
+
         console.log('destroyed');
         window.removeEventListener('keydown', this.escapeListen)
     },
     methods:{
+        getCommentsById: function(id) {
+            axios.get('/getCommentsById/' + id)
+                .then(function(resp) {
+                    console.log('com res', resp.data);
+                    this.cmtRes = resp.data
+                }.bind(this))
+        },
+        postComment: function() {
+            var tmpComment = {
+                id: this.imgidchild,
+                username: this.username,
+                comment: this.commentTxt
+            };
+            this.commentTxt = '';
+            this.username = '';
+            console.log('post this shit', tmpComment);
+            axios.post('/postComment', tmpComment)
+                .then(function(resp) {
+                    console.log('comm front res', resp);
+                    tmpComment.created_at = Date.now();
+                    this.cmtRes.unshift(tmpComment)
+                }.bind(this))
+                .catch(function(err) {
+                    console.log('err post cmt', err)
+                })
+        },
         escapeModal: function(e) {
             console.log(e);
             this.$emit('escaped', '')
@@ -42,8 +80,10 @@ Vue.component('img-modal', {
                 this.escapeModal()
             }
         }
-    },
+    }
 })
+
+    ////////////////////////////////// MAIN /////////////////////////////
 
 new Vue({
     el: '#main',

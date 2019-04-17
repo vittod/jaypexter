@@ -12,7 +12,7 @@ CREATE TABLE images(
 
 CREATE TABLE comments (
     id SERIAL PRIMARY key,
-    id_img_fk INTEGER NOT NULL UNIQUE,
+    id_img_fk INTEGER NOT NULL,
     comment VARCHAR(600),
     username VARCHAR(150),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

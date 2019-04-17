@@ -26,14 +26,15 @@
                 <button @click="uploadFile">share</button>
             </div>
 
-
-            <div id="image-container">
-                <div class="card" v-for="image in images"  @click="selectImg(image.id)">
-                    <div class="card-header">
-                        <img :src="image.url">
-                    </div>
-                    <div class="card-footer">
-                        <p>{{image.title}}</p>
+            <div id="image-container-wraper">
+                <div id="image-container">
+                    <div class="card" v-for="image in images" :key="image.id"  @click="selectImg(image.id)">
+                        <div class="card-header">
+                            <img :src="image.url">
+                        </div>
+                        <div class="card-footer">
+                            <p>{{image.title}}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -54,12 +55,12 @@
                         <h3>shared by: </h3> {{image.username}}
                     </div>
                     <div class="post-comment">
-                        <input type="text" v-model="commentTxt">
-                        <input type="text" v-model="username">
-                        <button @click=""></button>
+                        <input type="text" v-model="username" placeholder="user">
+                        <textarea type="text" v-model="commentTxt" placeholder="comment"></textarea>
+                        <button @click="postComment">share</button>
                     </div>
-                    <div class="comment-container">
-                        <comment></comment>
+                    <div v-if="cmtRes" class="comment-container">
+                        <comment v-for="comment in cmtRes" :key="comment.id" :comment="comment"></comment>
                     </div>
                 </div>
             </div>
@@ -67,7 +68,8 @@
 
         <script id="comment-temp" type="text/x-template">
             <div class="comment-instance">
-
+                <p>{{new Date(comment.created_at)}} {{comment.username}} says:</p>
+                {{comment.comment}}
             </div>
         </script>
 

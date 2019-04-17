@@ -22,7 +22,13 @@ exports.postNewImg = (url, username, title, description) => {
     return db.query(q, params)
 }
 
-exports.postComment(id, user, comment) {
+exports.getCommentsById = (id) => {
+    let q = `SELECT * FROM comments WHERE id_img_fk = $1`;
+    let params = [id];
+    return db.query(q, params)
+}
+
+exports.postComment = (id, user, comment) => {
     let q = `
             INSERT INTO comments (id_img_fk, username, comment)
             VALUES ($1, $2, $3) RETURNING id;`;
