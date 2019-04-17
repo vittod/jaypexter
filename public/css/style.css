@@ -22,6 +22,10 @@ body {
 .logo > *, .decription {
     margin-left: 20px;
 }
+.logo img {
+    align-self: center;
+    height: 60px;
+}
 
 .description {
     height: 3em;
@@ -62,4 +66,50 @@ body {
 
 .card-footer {
     margin: 5px;
+}
+
+.outer-modal {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+}
+.inner-modal {
+    width: 80%;
+    height: 80%;
+    background: #048998;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.modal-header {
+    height: 60%;
+}
+.modal-header img {
+    height: 100%;
+    width: auto;
+}
+.modal-meta {
+    display: flex;
+    align-items: center;
+}
+.modal-meta > * {
+    padding: 5px;
+
+}
+
+.comment-container {
+    width: 90%;
+}
+.comment-instance {
+    background: #e9e4e6;
+    border-radius: 15px;
+    width: 100%;
+    height: 3rem;
 }

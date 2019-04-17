@@ -5,37 +5,75 @@
     <link rel="stylesheet" href="css/style.css">
     <title>jaypexter</title>
 </head>
-<body>
+    <body>
 
-    <div id="main">
-        <div class="logo">
-            <h1>jaypexter</h1>
-            <h2>...dot by dot</h2>
-        </div>
+        <div id="main">
+            <div class="logo">
+                <img src="img/gorilla-face.jpg" alt="logo">
+                <h1>jaypexter</h1>
+                <h2>...dot by dot</h2>
+            </div>
 
-        <div class="description" @click="morph">
-            <p>{{describer}}</p>
-        </div>
+            <div class="description" @click="morph">
+                <p>{{describer}}</p>
+            </div>
+
+            <div class="search">
+                <input v-model="upForm.iTitle" type="text" placeholder="img title">
+                <input v-model="upForm.iDescr" type="text" placeholder="img description">
+                <input v-model="upForm.iUser" type="text" placeholder="user name">
+                <input @change="setFiles" type="file" accept="image/*" placeholder="file select..">
+                <button @click="uploadFile">share</button>
+            </div>
 
 
-        <div id="image-container">
-
-            <div class="card" v-for="image in images">
-                <div class="card-header">
-                    <img :src="image.url">
-                </div>
-                <div class="card-footer">
-                    <p>{{image.title}}</p>
+            <div id="image-container">
+                <div class="card" v-for="image in images"  @click="selectImg(image.id)">
+                    <div class="card-header">
+                        <img :src="image.url">
+                    </div>
+                    <div class="card-footer">
+                        <p>{{image.title}}</p>
+                    </div>
                 </div>
             </div>
 
+            <img-modal v-if="imgId" :imgidchild="imgId" @escaped="closeModal"></img-modal>
         </div>
 
-    </div>
+
+        <script id="modal-temp" type="text/x-template">
+            <div class="outer-modal" @click="escapeModal">
+                <div class="inner-modal" @click.stop>
+                    <div class="modal-header">
+                        <img :src="image.url">
+                    </div>
+                    <div class="modal-meta">
+                        <h3>title: </h3> {{image.title}}
+                        <h3>details: </h3> {{image.description}}
+                        <h3>shared by: </h3> {{image.username}}
+                    </div>
+                    <div class="post-comment">
+                        <input type="text" v-model="commentTxt">
+                        <input type="text" v-model="username">
+                        <button @click=""></button>
+                    </div>
+                    <div class="comment-container">
+                        <comment></comment>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+        <script id="comment-temp" type="text/x-template">
+            <div class="comment-instance">
+
+            </div>
+        </script>
 
 
-    <script src="/js/vue.js"></script>
-    <script src="/js/axios.min.js"></script>
-    <script type="text/javascript" src="js/iBoard.js"></script>
-</body>
+        <script src="/js/vue.js"></script>
+        <script src="/js/axios.min.js"></script>
+        <script type="text/javascript" src="js/iBoard.js"></script>
+    </body>
 </html>

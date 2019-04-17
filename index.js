@@ -1,18 +1,69 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const multer = require('multer')
+const uidSafe = require('uid-safe')
+const path = require('path')
 const db = require('./utility/db')
+const s3 = require('./utility/s3')
 
 app.use(require('body-parser').json())
 app.use(express.static(__dirname + '/public/'))
 
 
+const diskStorage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, __dirname + '/uploads');
+    },
+    filename: function (req, file, callback) {
+      uidSafe(24).then(function(uid) {
+          callback(null, uid + path.extname(file.originalname));
+      });
+    }
+});
+
+const uploader = multer({
+    storage: diskStorage,
+    limits: {
+        fileSize: 2097152
+    }
+});
+
 
 app.get('/getRecent', (req, res) => {
-    db.getRecentImages()
+    db.getRecent()
         .then(({rows}) => {
             res.json(rows)
         })
+})
+
+app.get('/getById/:id', (req, res) => {
+    console.log('para', req.params.id);
+    db.getById(req.params.id)
+        .then(({rows}) => {
+            console.log('index', rows);
+            res.json(rows)
+        })
+})
+
+app.post('/postImg', uploader.single('iFile'), s3.upload, (req, res) => {
+
+    console.log('index', res.locals.newImg)
+
+    if (req.file) {
+        db.postNewImg(res.locals.newImg.url, res.locals.newImg.username, res.locals.newImg.title, res.locals.newImg.description)
+            then(dbEntry => {
+                console.log(dbEntry);
+                res.json({
+                    success: true,
+                    url: res.locals.newImg.url
+                });
+            })
+    } else {
+        res.json({
+            success: false
+        });
+    }
 })
 
 
