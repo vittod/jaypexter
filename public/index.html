@@ -27,6 +27,7 @@
             </div>
 
             <div id="image-container-wraper">
+                <button v-if="notFirst" @click="loadPrev">prev</button>
                 <div id="image-container">
                     <div class="card" v-for="image in images" :key="image.id"  @click="selectImg(image.id)">
                         <div class="card-header">
@@ -37,6 +38,7 @@
                         </div>
                     </div>
                 </div>
+                <button v-if="notLast" @click="loadNext">next</button>
             </div>
 
             <img-modal v-if="imgId" :imgidchild="imgId" @escaped="closeModal"></img-modal>

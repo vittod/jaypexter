@@ -6,8 +6,8 @@ body {
     margin: 0;
 }
 
-#main {
-
+body {
+    /* background: url(../img/overlay_diagonal-80.png) repeat; */
 }
 
 .logo h1, h2{

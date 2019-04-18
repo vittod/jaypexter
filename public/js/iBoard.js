@@ -1,6 +1,7 @@
 "use strict";
 
     ////////////////////////////////// COMMENT /////////////////////////////
+    /////////////////////////////////////////////////////////////////////
 
 Vue.component('comment', {
     template: '#comment-temp',
@@ -11,6 +12,7 @@ Vue.component('comment', {
 })
 
     ////////////////////////////////// MODAL /////////////////////////////
+    /////////////////////////////////////////////////////////////////////
 
 Vue.component('img-modal', {
     template: '#modal-temp',
@@ -84,26 +86,51 @@ Vue.component('img-modal', {
 })
 
     ////////////////////////////////// MAIN /////////////////////////////
-
+    /////////////////////////////////////////////////////////////////////
 new Vue({
     el: '#main',
     data: {
-        images: [],
         describer: 'latest images',
+        images: [],
+        imgId: '',
         upForm: {
             iTitle: '',
             iUser: '',
             iDescr: '',
             iFiles: []
         },
-        imgId: ''
+        notFirst: false,
+        notLast: true
     },
     mounted: function() {
         axios.get('/getRecent').then(function(resp) {
-            this.images = resp.data.sort(this.sortImg);
+            this.images = resp.data;
         }.bind(this))
     },
     methods: {
+        loadNext: function() {
+            axios.get('/getNext/' + this.images[this.images.length - 1].id)
+                .then(function(resp) {
+                    console.log('new page next..', resp.data);
+                    this.images = resp.data;
+                    console.log(resp.data[0].lowest_id === resp.data[resp.data.length -1].id, resp.data[0].lowest_id, resp.data[resp.data.length -1].id);
+                    resp.data[0].highest_id === resp.data[0].id ? this.notFirst = false : this.notFirst = true;
+                    resp.data[0].lowest_id === resp.data[resp.data.length -1].id ? this.notLast = false : this.notLast = true;
+                    console.log('not last', this.notLast);
+                }.bind(this))
+        },
+        loadPrev: function() {
+            console.log('ajsaksxkas', this.images[0].id);
+            axios.get('/getPrev/' + this.images[this.images.length - 1].id)
+                .then(function(resp) {
+                    console.log('new page prev..', resp.data);
+                    this.images = resp.data;
+                    console.log(resp.data[0].highest_id === resp.data[0].id, resp.data[0].highest_id, resp.data[0].id);
+                    resp.data[0].highest_id === resp.data[0].id ? this.notFirst = false : this.notFirst = true;
+                    resp.data[0].lowest_id === resp.data[resp.data.length -1].id ? this.notLast = false : this.notLast = true;
+                    console.log('not first', this.notFirst);
+                }.bind(this))
+        },
         closeModal: function() {
             this.imgId = ''
         },
@@ -111,9 +138,16 @@ new Vue({
             this.imgId = id
             console.log(this.imgId);
         },
+        ////
+        ////    this is depricated... sorting in the db.query now
+        ////
         sortImg: function(a, b) {
             return new Date(b.created_at) - new Date(a.created_at)
-        },
+        }
+        ////
+        ////    this is depricated... sorting in the db.query now
+        ////
+        ,
         setFiles: function(e) {
             this.upForm.iFiles = Array.prototype.slice.call(e.target.files);
             console.log(this.upForm.iFiles);

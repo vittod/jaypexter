@@ -37,6 +37,22 @@ app.get('/getRecent', (req, res) => {
         })
 })
 
+app.get('/getNext/:id', (req, res) => {
+    db.getNext(req.params.id)
+        .then(({rows}) => {
+            console.log(rows);
+            res.json(rows)
+        })
+})
+
+app.get('/getPrev/:id', (req, res) => {
+    db.getPrev(req.params.id)
+        .then(({rows}) => {
+            console.log(rows);
+            res.json(rows)
+        })
+})
+
 app.get('/getById/:id', (req, res) => {
     console.log('para', req.params.id);
     db.getById(req.params.id)
