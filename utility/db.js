@@ -11,7 +11,7 @@ exports.getRecent = () => {
             LIMIT 1
         ) AS lowest_id FROM images
         ORDER BY id DESc
-        LIMIT 2;`
+        LIMIT 3;`
 
     return db.query(q)
 }
@@ -29,7 +29,7 @@ exports.getNext = (id) => {
         ) AS highest_id FROM images
         WHERE id < $1
         ORDER BY id DESC
-        LIMIT 2;`;
+        LIMIT 3;`;
     let params = [id];
     return db.query(q, params)
 }
@@ -47,7 +47,7 @@ exports.getPrev = (id) => {
         ) AS highest_id FROM images
         WHERE id > $1
         ORDER BY id DESC
-        LIMIT 2;`;
+        LIMIT 3;`;
     let params = [id];
     return db.query(q, params)
 }

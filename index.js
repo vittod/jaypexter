@@ -60,6 +60,10 @@ app.get('/getById/:id', (req, res) => {
             console.log('index', rows);
             res.json(rows)
         })
+        .catch(err => {
+            res.status(404).json([])
+            console.log('no img..', err);
+        })
 })
 
 app.post('/postImg', uploader.single('iFile'), s3.upload, (req, res) => {

@@ -28,6 +28,11 @@ Vue.component('img-modal', {
     mounted: function() {
         axios.get('/getById/' + this.imgidchild)
             .then(function(resp) {
+                console.log('return length', resp.data.length);
+                if (resp.data.length < 1) {
+                    this.escapeModal();
+                    return
+                }
                 console.log('got back', resp.data[0]);
                 this.image = resp.data[0]
             }.bind(this));
@@ -37,12 +42,11 @@ Vue.component('img-modal', {
         window.addEventListener('keydown', this.escapeListen.bind(this))
     },
     destroyed: function() {
-
-        ////////////////
-        ////////////////    does not remove listener ???
-        ////////////////
-
         console.log('destroyed');
+        location.hash = '#';
+        ////
+        // WARNING:   does not remove listener ???
+        ////
         window.removeEventListener('keydown', this.escapeListen)
     },
     methods:{
@@ -103,11 +107,37 @@ new Vue({
         notLast: true
     },
     mounted: function() {
-        axios.get('/getRecent').then(function(resp) {
-            this.images = resp.data;
+        axios.get('/getRecent')
+            .then(function(resp) {
+                this.images = resp.data;
+            }.bind(this))
+
+        this.checkHash();
+        window.addEventListener('hashchange', function() {
+            this.checkHash()
         }.bind(this))
     },
+    watch: {
+        imgId: function(id) {
+            this.selectImg(id)
+        }
+    },
     methods: {
+        checkHash: function(currHash) {
+            var currHash = location.hash.slice(1);
+            console.log('curr hash..', currHash);
+            this.imgId = '';
+
+            ////////
+            // WARNING: does not reload because it does not destroy the component..
+
+            if (typeof +currHash === 'number' && !isNaN(+currHash)) {
+                console.log('dvabcnads', this.imgId, currHash);
+                this.imgId = currHash
+            } else {
+                location.hash = '#'
+            }
+        },
         loadNext: function() {
             axios.get('/getNext/' + this.images[this.images.length - 1].id)
                 .then(function(resp) {
@@ -136,17 +166,19 @@ new Vue({
         },
         selectImg: function(id) {
             this.imgId = id
-            console.log(this.imgId);
+            console.log('show modal..', this.imgId);
         },
         ////
-        ////    this is depricated... sorting in the db.query now
+        //      WARNING: this is DEPRICATED... sorting in the db.query now
         ////
         sortImg: function(a, b) {
             return new Date(b.created_at) - new Date(a.created_at)
         }
         ////
-        ////    this is depricated... sorting in the db.query now
+        //      WARNING: this is DEPRICATED... sorting in the db.query now
         ////
+
+
         ,
         setFiles: function(e) {
             this.upForm.iFiles = Array.prototype.slice.call(e.target.files);

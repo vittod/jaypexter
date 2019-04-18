@@ -29,13 +29,15 @@
             <div id="image-container-wraper">
                 <button v-if="notFirst" @click="loadPrev">prev</button>
                 <div id="image-container">
-                    <div class="card" v-for="image in images" :key="image.id"  @click="selectImg(image.id)">
-                        <div class="card-header">
-                            <img :src="image.url">
-                        </div>
-                        <div class="card-footer">
-                            <p>{{image.title}}</p>
-                        </div>
+                    <div class="card" v-for="image in images" :key="image.id"> <!--@click="selectImg(image.id)"-->
+                        <a :href="'#' + image.id">
+                            <div class="card-header">
+                                <img :src="image.url">
+                            </div>
+                            <div class="card-footer">
+                                <p>{{image.title}}</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <button v-if="notLast" @click="loadNext">next</button>
