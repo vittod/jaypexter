@@ -26,7 +26,24 @@ Vue.component('img-modal', {
         }
     },
     mounted: function() {
-        axios.get('/getById/' + this.imgidchild)
+        this.loadModalData()
+    },
+    watch: {
+        imgidchild: function() {
+            this.loadModalData()
+        }
+    },
+    destroyed: function() {
+        console.log('destroyed');
+        location.hash = '#';
+        ////
+        // WARNING:   does not remove listener ???
+        ////
+        window.removeEventListener('keydown', this.escapeListen)
+    },
+    methods: {
+        loadModalData: function() {
+            axios.get('/getById/' + this.imgidchild)
             .then(function(resp) {
                 console.log('return length', resp.data.length);
                 if (resp.data.length < 1) {
@@ -37,19 +54,10 @@ Vue.component('img-modal', {
                 this.image = resp.data[0]
             }.bind(this));
 
-        this.getCommentsById(this.imgidchild);
+            this.getCommentsById(this.imgidchild);
 
-        window.addEventListener('keydown', this.escapeListen.bind(this))
-    },
-    destroyed: function() {
-        console.log('destroyed');
-        location.hash = '#';
-        ////
-        // WARNING:   does not remove listener ???
-        ////
-        window.removeEventListener('keydown', this.escapeListen)
-    },
-    methods:{
+            window.addEventListener('keydown', this.escapeListen.bind(this))
+        },
         getCommentsById: function(id) {
             axios.get('/getCommentsById/' + id)
                 .then(function(resp) {
@@ -124,16 +132,16 @@ new Vue({
     },
     methods: {
         checkHash: function(currHash) {
+            //this.closeModal();
             var currHash = location.hash.slice(1);
             console.log('curr hash..', currHash);
-            this.imgId = '';
 
             ////////
             // WARNING: does not reload because it does not destroy the component..
 
             if (typeof +currHash === 'number' && !isNaN(+currHash)) {
-                console.log('dvabcnads', this.imgId, currHash);
                 this.imgId = currHash
+                console.log('set curr hash', this.imgId, currHash);
             } else {
                 location.hash = '#'
             }
@@ -163,6 +171,7 @@ new Vue({
         },
         closeModal: function() {
             this.imgId = ''
+            console.log('should destroy modal by setting imgId to ""..', this.imgId);
         },
         selectImg: function(id) {
             this.imgId = id
