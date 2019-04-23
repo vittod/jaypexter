@@ -35,12 +35,12 @@
                     <i class="fas fa-sync-alt fa-spin"></i>
                 </div>
 
+                <upload-form v-for="file in upForm.iFiles" :idx="upForm.iFiles.indexOf(file)" @updatemeta="updateMeta($event)"></upload-form>
                 <div class="meta-Form">
-                    <input v-model="upForm.iTitle" type="text" placeholder="img title">
-                    <input v-model="upForm.iDescr" type="text" placeholder="img description">
-                    <input v-model="upForm.iUser" type="text" placeholder="user name">
                     <button @click="uploadFile">share</button>
                 </div>
+
+
             </div>
 
             <div class="pagination">
@@ -68,6 +68,15 @@
             <img-modal v-if="imgId" :imgidchild="imgId" @escape="closeModal" @refresh="getRecent"></img-modal>
 
         </div>
+
+        <script id="upform-temp" type="text/x-template">
+            <div class="meta-Form">
+                {{idx + 1}}
+                <input v-model="iTitle" type="text" placeholder="img title">
+                <input v-model="iDescr" type="text" placeholder="img description">
+                <input v-model="iUser" type="text" placeholder="user name">
+            </div>
+        </script>
 
 
         <script id="modal-temp" type="text/x-template">

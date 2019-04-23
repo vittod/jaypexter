@@ -110,20 +110,61 @@ Vue.component('img-modal', {
     }
 })
 
+    ////////////////////////////////// UPLOAD META FORM /////////////////
+    /////////////////////////////////////////////////////////////////////
+
+Vue.component('upload-form', {
+    template: '#upform-temp',
+    props: ['idx'],
+    data: function() {
+        return {
+            iTitle: '',
+            iDescr: '',
+            iUser: ''
+        }
+    },
+    watch: {
+        iTitle: function() {
+            this.updateData()
+        },
+        iDescr: function() {
+            this.updateData()
+        },
+        iUser: function() {
+            this.updateData()
+        }
+    },
+    methods: {
+        updateData: function() {
+            this.$emit('updatemeta', {
+                iTitle: this.iTitle,
+                iDescr: this.iDescr,
+                iUser: this.iUser,
+                idx: this.idx
+            })
+        }
+    }
+
+})
+
+    ////////////////////////////////// FILTER //////////////////////////
+    /////////////////////////////////////////////////////////////////////
+
 Vue.filter('filterDate', function(dateString) {
     var dateObj = new Date(dateString)
     return `${dateObj.getHours()}:${dateObj.getMinutes()} ${dateObj.getMonth()}/${dateObj.getDay()}/${dateObj.getFullYear()}`
 })
 
-
     ////////////////////////////////// MAIN /////////////////////////////
     /////////////////////////////////////////////////////////////////////
+
 new Vue({
     el: '#main',
     data: {
         describer: 'latest images',
         images: [],
         imgId: '',
+        metaDataCollection: {},
         upForm: {
             iTitle: '',
             iUser: '',
@@ -171,6 +212,10 @@ new Vue({
         }
     },
     methods: {
+        updateMeta: function(evt) {
+            //console.log(evt);
+            this.metaDataCollection[evt.idx] = evt
+        },
         checkHash: function(currHash) {
             //this.closeModal();
             var currHash = location.hash.slice(1);
@@ -219,15 +264,11 @@ new Vue({
             console.log(this.upForm.iFiles);
         },
         uploadFile: function() {
-
-            ////// if iFiles.length > 1 open new modal to get metadata
-            ////// probably
-
             this.upForm.iFiles.forEach(function(el, i) {
                 var upData = new FormData();
-                upData.append('iTitle', this.upForm.iTitle);
-                upData.append('iUser', this.upForm.iUser);
-                upData.append('iDescr', this.upForm.iDescr);
+                upData.append('iTitle', this.metaDataCollection[i].iTitle || '');
+                upData.append('iUser', this.metaDataCollection[i].iUser || '');
+                upData.append('iDescr', this.metaDataCollection[i].iDescr || '');
                 upData.append('iFile', el);
                 var tmpTitle = this.upForm.iTitle;
                 this.showLoader = true;
@@ -239,6 +280,7 @@ new Vue({
                     .catch(err => console.log('err post img..', err))
                 this.upForm = {iFiles: []};
             }.bind(this))
+            this.metaDataCollection = {}
         },
         getRecent: function() {
             axios.get('/getRecent')
