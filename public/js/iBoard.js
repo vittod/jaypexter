@@ -36,9 +36,7 @@ Vue.component('img-modal', {
     destroyed: function() {
         console.log('destroyed');
         location.hash = '#';
-        ////
-        // WARNING:   does not remove listener ???
-        ////
+    
         window.removeEventListener('keydown', this.escapeListen)
     },
     methods: {
@@ -56,7 +54,8 @@ Vue.component('img-modal', {
 
             this.getCommentsById(this.imgidchild);
 
-            window.addEventListener('keydown', this.escapeListen.bind(this))
+            this.escapeListen = this.escapeListen.bind(this);
+            window.addEventListener('keydown', this.escapeListen)
         },
         getCommentsById: function(id) {
             axios.get('/getCommentsById/' + id)
@@ -299,6 +298,8 @@ new Vue({
                     console.log('cant get first page..', err);
                 })
         },
+
+        // WARNING:  artefact.. delete or change
         morph: function() {
             console.log(1);
             var res = this.describer;
