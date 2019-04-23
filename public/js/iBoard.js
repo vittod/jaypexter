@@ -240,6 +240,10 @@ new Vue({
                 }.bind(this))
         },
         loadPrev: function() {
+
+            // WARNING:         jumst to the fist not prev age..
+            //
+
             console.log('ajsaksxkas', this.images[0].id);
             axios.get('/getPrev/' + this.images[this.images.length - 1].id)
                 .then(function(resp) {
@@ -264,22 +268,22 @@ new Vue({
             console.log(this.upForm.iFiles);
         },
         uploadFile: function() {
-            this.upForm.iFiles.forEach(function(el, i) {
+            Promise.all(this.upForm.iFiles.map(function(el, i) {
                 var upData = new FormData();
-                upData.append('iTitle', this.metaDataCollection[i].iTitle || '');
-                upData.append('iUser', this.metaDataCollection[i].iUser || '');
-                upData.append('iDescr', this.metaDataCollection[i].iDescr || '');
+                upData.append('iTitle', this.metaDataCollection[i] ? this.metaDataCollection[i].iTitle : '');
+                upData.append('iUser', this.metaDataCollection[i] ? this.metaDataCollection[i].iUser : '');
+                upData.append('iDescr', this.metaDataCollection[i] ? this.metaDataCollection[i].iDescr : '');
                 upData.append('iFile', el);
                 var tmpTitle = this.upForm.iTitle;
                 this.showLoader = true;
-                axios.post('/postImg', upData)
-                    .then(function(resp) {
-                        this.getRecent();
-                        this.showLoader = false
-                    }.bind(this))
-                    .catch(err => console.log('err post img..', err))
-                this.upForm = {iFiles: []};
-            }.bind(this))
+                return axios.post('/postImg', upData)
+            }.bind(this)))
+                .then(function(resp) {
+                    this.getRecent();
+                    this.showLoader = false
+                }.bind(this))
+                .catch(err => console.log('err post img..', err))
+            this.upForm = {iFiles: []};
             this.metaDataCollection = {}
         },
         getRecent: function() {
