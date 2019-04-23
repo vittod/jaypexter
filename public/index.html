@@ -1,7 +1,12 @@
 <!doctype html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link href="https://fonts.googleapis.com/css?family=Anton|Exo+2|Fjalla+One|Libre+Baskerville|Lobster|Pacifico|Varela+Round" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
     <title>jaypexter</title>
 </head>
@@ -11,7 +16,6 @@
             <div class="logo">
                 <img src="img/gorilla-face.jpg" alt="logo">
                 <h1>jaypexter</h1>
-                <h2>...dot by dot</h2>
             </div>
 
             <div class="description" @click="morph">
@@ -19,18 +23,36 @@
             </div>
 
             <div class="search">
-                <input v-model="upForm.iTitle" type="text" placeholder="img title">
-                <input v-model="upForm.iDescr" type="text" placeholder="img description">
-                <input v-model="upForm.iUser" type="text" placeholder="user name">
-                <input @change="setFiles" type="file" accept="image/*" placeholder="file select..">
-                <button @click="uploadFile">share</button>
+                <div id="box-upload" v-if="!showLoader">
+                    <input id="fileupload" @change="setFiles" type="file" accept="image/*" multiple>
+                    <label for="fileupload"><strong>Choose file</strong><span class="box__dragndrop"> or drag upon..</span>.</label>
+                    <div class="files">
+                        <p v-for="file in upForm.iFiles">{{file.name}}</p>
+                    </div>
+                </div>
+
+                <div id="box-uploading" v-if="showLoader">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                </div>
+
+                <div class="meta-Form">
+                    <input v-model="upForm.iTitle" type="text" placeholder="img title">
+                    <input v-model="upForm.iDescr" type="text" placeholder="img description">
+                    <input v-model="upForm.iUser" type="text" placeholder="user name">
+                    <button @click="uploadFile">share</button>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <div class="empty-placeholder" v-if="!notFirst"></div>
+                <div v-if="notFirst" @click="loadPrev"><i class="fas fa-angle-double-left fa-2x"></i></div>
+                <div v-if="notLast" @click="loadNext"><i class="fas fa-angle-double-right fa-2x"></i></div>
+                <div class="empty-placeholder" v-if="!notLast"></div>
             </div>
 
             <div id="image-container-wraper">
-                <div class="empty-placeholder" v-if="!notFirst"></div>
-                <button v-if="notFirst" @click="loadPrev">prev</button>
                 <div id="image-container">
-                    <div class="card" v-for="image in images" :key="image.id"> <!--@click="selectImg(image.id)"-->
+                    <div class="card" v-for="image in images" :key="image.id">
                         <a :href="'#' + image.id">
                             <div class="card-header">
                                 <img :src="image.url">
@@ -41,11 +63,10 @@
                         </a>
                     </div>
                 </div>
-                <button v-if="notLast" @click="loadNext">next</button>
-                <div class="empty-placeholder" v-if="!notLast"></div>
             </div>
 
-            <img-modal v-if="imgId" :imgidchild="imgId" @escaped="closeModal"></img-modal>
+            <img-modal v-if="imgId" :imgidchild="imgId" @escape="closeModal" @refresh="getRecent"></img-modal>
+
         </div>
 
 
@@ -56,15 +77,24 @@
                         <img :src="image.url">
                     </div>
                     <div class="modal-meta">
-                        <h3>title: </h3> {{image.title}}
-                        <h3>details: </h3> {{image.description}}
-                        <h3>shared by: </h3> {{image.username}}
+                        <div class="img-about">
+                            <h3>title: </h3> {{image.title}}
+                            <h3>shared by: </h3> {{image.username}}
+                        </div>
+                        <div class="img-about">
+                            <h3>details: </h3> {{image.description}}
+                        </div>
                     </div>
+
+                    <div class="deleteButton" @click="deleteImg(image.id)"><i class="fas fa-trash-alt fa-2x"></i></div>
+
                     <div class="post-comment">
                         <input type="text" v-model="username" placeholder="user">
                         <textarea type="text" v-model="commentTxt" placeholder="comment"></textarea>
                         <button @click="postComment">share</button>
                     </div>
+
+
                     <div v-if="cmtRes" class="comment-container">
                         <comment v-for="comment in cmtRes" :key="comment.id" :comment="comment"></comment>
                     </div>
@@ -74,8 +104,8 @@
 
         <script id="comment-temp" type="text/x-template">
             <div class="comment-instance">
-                <p>{{new Date(comment.created_at)}} {{comment.username}} says:</p>
                 {{comment.comment}}
+                <p>said {{comment.username}} at {{comment.created_at | filterDate}}  </p>
             </div>
         </script>
 

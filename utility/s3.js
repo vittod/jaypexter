@@ -1,12 +1,18 @@
-const knox = require('knox-s3');
-const fs = require('fs');
+const knox = require('knox-s3')
+const fs = require('fs')
+const path = require('path')
+const url = require('url')
 
-let secrets;
-if (process.env.NODE_ENV == 'production') {
-    sec = process.env; // in prod the secrets are environment variables
-} else {
-    sec = require('../.secret')
-}
+///////////
+// WARNING: maybe turn conditions back on..
+///////////
+
+let sec;
+// if (process.env.NODE_ENV == 'production') {
+//     sec = process.env; // in prod the secrets are environment variables
+// } else {
+    sec = require('../.secret');
+// }
 
 const client = knox.createClient({
     key: sec.AWS.AWS_KEY,
@@ -40,5 +46,25 @@ exports.upload = function(req, res, next) {
         } else {
             res.sendStatus(500);
         }
-    });
-};
+    })
+}
+
+exports.deleteImg = (req, res, next) => {
+    try {
+        let delBase = path.parse(req.body.delUrl).base;
+        console.log('deleting from bucket..', delBase);
+        client.deleteFile(`/${delBase}`, (err, res) => {
+            if (err) {
+                console.log('err del s3..', err);
+                res.sendStatus(500);
+            } else {
+                console.log('deleted', res.statusCode);
+            }
+        })
+    } catch (err) {
+        console.log('err del s3..', err);
+        res.sendStatus(500);
+    }
+    next()
+
+}

@@ -84,6 +84,18 @@ app.post('/postImg', uploader.single('iFile'), s3.upload, (req, res) => {
     }
 })
 
+app.post('/deleteImg', s3.deleteImg, (req, res) => {
+    if (req.body.delId) {
+        console.log('deleting..', req.body.delId);
+        db.deleteImg(req.body.delId)
+            .then(({data}) => {
+                console.log(data);
+                res.json(data)
+            })
+            .catch(err => console.log('del err..', err))
+    }
+})
+
 app.get('/getCommentsById/:id', (req, res) => {
     console.log('index req', req.params.id);
     db.getCommentsById(req.params.id)

@@ -9,9 +9,13 @@ exports.getRecent = () => {
             SELECT id FROM images
             ORDER BY id ASC
             LIMIT 1
-        ) AS lowest_id FROM images
-        ORDER BY id DESc
-        LIMIT 3;`
+        ) AS lowest_id, (
+            SELECT id FROM images
+            ORDER BY id DESC
+            LIMIT 1
+        ) AS highest_id FROM images
+        ORDER BY id DESC
+        LIMIT 8;`
 
     return db.query(q)
 }
@@ -29,7 +33,7 @@ exports.getNext = (id) => {
         ) AS highest_id FROM images
         WHERE id < $1
         ORDER BY id DESC
-        LIMIT 3;`;
+        LIMIT 8;`;
     let params = [id];
     return db.query(q, params)
 }
@@ -47,7 +51,7 @@ exports.getPrev = (id) => {
         ) AS highest_id FROM images
         WHERE id > $1
         ORDER BY id DESC
-        LIMIT 3;`;
+        LIMIT 8;`;
     let params = [id];
     return db.query(q, params)
 }
@@ -60,7 +64,15 @@ exports.getById = (id) => {
 
 exports.postNewImg = (url, username, title, description) => {
     let params = [url, username, title, description];
-    let q = `INSERT INTO images (url, username, title, description) VALUES ($1, $2, $3, $4) RETURNING id;`;
+    let q = `
+        INSERT INTO images (url, username, title, description)
+        VALUES ($1, $2, $3, $4) RETURNING id;`;
+    return db.query(q, params)
+}
+
+exports.deleteImg = (id) => {
+    let params = [id];
+    let q = `DELETE FROM images WHERE id = $1`;
     return db.query(q, params)
 }
 

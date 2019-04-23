@@ -11,7 +11,7 @@ Vue.component('comment', {
     }
 })
 
-    ////////////////////////////////// MODAL /////////////////////////////
+    ////////////////////////////////// MODAL IMG /////////////////////////
     /////////////////////////////////////////////////////////////////////
 
 Vue.component('img-modal', {
@@ -86,16 +86,35 @@ Vue.component('img-modal', {
         },
         escapeModal: function(e) {
             console.log(e);
-            this.$emit('escaped', '')
+            this.$emit('escape', '')
         },
         escapeListen: function(e) {
             console.log(e.key);
             if (e.key === 'Escape') {
                 this.escapeModal()
             }
+        },
+        deleteImg: function(id) {
+
+            axios.post('/deleteImg', { delId: id, delUrl: this.image.url })
+            .then(function(resp) {
+                console.log('deleted..', resp);
+                this.$emit('refresh')
+                this.escapeModal();
+            }.bind(this))
+            .catch(function(err) {
+                console.log('prob deleting..', err);
+            })
+
         }
     }
 })
+
+Vue.filter('filterDate', function(dateString) {
+    var dateObj = new Date(dateString)
+    return `${dateObj.getHours()}:${dateObj.getMinutes()} ${dateObj.getMonth()}/${dateObj.getDay()}/${dateObj.getFullYear()}`
+})
+
 
     ////////////////////////////////// MAIN /////////////////////////////
     /////////////////////////////////////////////////////////////////////
@@ -111,18 +130,39 @@ new Vue({
             iDescr: '',
             iFiles: []
         },
+        dropzone: {},
         notFirst: false,
-        notLast: true
+        notLast: true,
+        siteLimit: 8,
+        showLoader: false
     },
     mounted: function() {
-        axios.get('/getRecent')
-            .then(function(resp) {
-                this.images = resp.data;
-            }.bind(this))
-
+                                        ////////////////////////////////////////initialize
+        this.getRecent();
         this.checkHash();
         window.addEventListener('hashchange', function() {
             this.checkHash()
+        }.bind(this))
+                                        ////////////////////////////////////////dragstuff
+        this.dropzone = document.getElementById('box-upload');
+        ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop']
+            .forEach(function(el) {
+                this.dropzone.addEventListener(el, function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                })
+            }.bind(this))
+        console.log(this.dropzone);
+        this.dropzone.addEventListener('drop', function(e) {
+            this.upForm.iFiles = Array.prototype.slice.call(e.dataTransfer.files)
+            this.dropzone.classList.remove('box-upload-drag')
+            console.log(this.upForm.iFiles);
+        }.bind(this))
+        this.dropzone.addEventListener('dragenter', function() {
+            this.dropzone.classList.add('box-upload-drag')
+        }.bind(this))
+        this.dropzone.addEventListener('dragleave', function() {
+            this.dropzone.classList.remove('box-upload-drag')
         }.bind(this))
     },
     watch: {
@@ -135,9 +175,6 @@ new Vue({
             //this.closeModal();
             var currHash = location.hash.slice(1);
             console.log('curr hash..', currHash);
-
-            ////////
-            // WARNING: does not reload because it does not destroy the component..
 
             if (typeof +currHash === 'number' && !isNaN(+currHash)) {
                 this.imgId = currHash
@@ -177,40 +214,44 @@ new Vue({
             this.imgId = id
             console.log('show modal..', this.imgId);
         },
-        ////
-        //      WARNING: this is DEPRICATED... sorting in the db.query now
-        ////
-        sortImg: function(a, b) {
-            return new Date(b.created_at) - new Date(a.created_at)
-        }
-        ////
-        //      WARNING: this is DEPRICATED... sorting in the db.query now
-        ////
-
-
-        ,
         setFiles: function(e) {
             this.upForm.iFiles = Array.prototype.slice.call(e.target.files);
             console.log(this.upForm.iFiles);
         },
-        uploadFile: function(e) {
-            this.upForm.iFiles.forEach(function(el) {
+        uploadFile: function() {
+
+            ////// if iFiles.length > 1 open new modal to get metadata
+            ////// probably
+
+            this.upForm.iFiles.forEach(function(el, i) {
                 var upData = new FormData();
                 upData.append('iTitle', this.upForm.iTitle);
                 upData.append('iUser', this.upForm.iUser);
                 upData.append('iDescr', this.upForm.iDescr);
                 upData.append('iFile', el);
                 var tmpTitle = this.upForm.iTitle;
-                this.upForm = {};
+                this.showLoader = true;
                 axios.post('/postImg', upData)
                     .then(function(resp) {
-                        this.images.unshift({
-                            url: resp.data.url,
-                            title: tmpTitle
-                        })
+                        this.getRecent();
+                        this.showLoader = false
                     }.bind(this))
                     .catch(err => console.log('err post img..', err))
+                this.upForm = {iFiles: []};
             }.bind(this))
+        },
+        getRecent: function() {
+            axios.get('/getRecent')
+                .then(function({data}) {
+                    console.log(data);
+                    if (data[data.length -1].lowest_id === data[data.length -1].id) {
+                        this.notLast = false
+                    }
+                    this.images = data;
+                }.bind(this))
+                .catch(function(err) {
+                    console.log('cant get first page..', err);
+                })
         },
         morph: function() {
             console.log(1);

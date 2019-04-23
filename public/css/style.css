@@ -2,6 +2,11 @@
     font-family: 'Varela Round', sans-serif;
 }
 
+*:focus {
+    outline: 0;
+    box-shadow: 2px 3px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
 body {
     margin: 0;
 }
@@ -14,13 +19,14 @@ body {
     font-family: 'Exo 2', sans-serif;
 }
 
-.logo {
+.logo, .description {
     display: flex;
     align-items: baseline;
-    background: #f6f5f5
+    background: #f6f5f5;
+    padding-left: 20px;
 }
-.logo > *, .decription {
-    margin-left: 20px;
+.logo > * {
+    margin-right: 20px;
 }
 .logo img {
     align-self: center;
@@ -32,18 +38,92 @@ body {
     background: #3bb4c1;
     margin-top: 0;
     display: flex;
-    padding-left: 20px;
     margin-bottom: 2em;
-    padding-left: 6%;
+
 }
 
 .search {
-    margin-left: 6%;
+    margin-left: 20px;
+}
+
+#box-upload {
+    background: #e9e4e6;
+    outline: 1px dashed black;
+    outline-offset: -5px;
+    min-height: 5rem;
+    width: calc(100% - 40px);
+    padding-right: 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center ;
+    align-items: center;
+}
+#box-upload.box-upload-drag {
+    background: #f6f5f5;
+    outline-offset: -8px;
+}
+#box-upload label {
+    padding: 5px;
+    cursor: pointer;
+}
+
+#box-upload input {
+    width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.files > * {
+    font-size: 0.5em;
+}
+#box-uploading {
+    background: #f6f5f5;
+    outline: 1px dashed black;
+
+    min-height: 5rem;
+    width: calc(100% - 40px);
+    padding-right: 20px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center ;
+    align-items: center;
+    animation: 2s loading-line infinite;
+    animation-timing-function: linear;
+}
+
+.meta-Form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+input, textarea {
+    border: none;
+    border-radius: 2px;
+    background: #f6f5f5;
+    font-size: 1em;
+    margin: 2px;
+}
+button {
+    border: 2px #49beb7 solid;
+    border-radius: 2px;
+    background: none;
+    font-size: 1em;
+    margin: 2px;
+}
+button:hover {
+    background: #f6f5f5;
 }
 
 #image-container-wraper {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
 }
 
 #image-container {
@@ -53,14 +133,30 @@ body {
     /* width: 90%; */
 }
 
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+.pagination > *:hover {
+    opacity: 0.7;
+}
+
 .card {
     width: 300px;
     border: 1px solid black;
-    border-radius: 15px;
+    border-radius: 10px;
     overflow: hidden;
     margin: 10px;
-    background: #f6f5f5
+    background: #f6f5f5;
+    box-shadow: 0px 1px 2px 0px #085f63;
 }
+.card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0px 2px 3px 0px #085f63;
+}
+
 .card-header {
     width: 300px;
     height: 300px;
@@ -68,6 +164,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background: #3bb4c1;
 }
 
 .card-header img {
@@ -92,13 +189,15 @@ body {
 .inner-modal {
     /* width: 80%; */
     min-height: 60%;
-    max-height: 90%;
+    max-height: 100%;
     background: #048998;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    box-shadow: 1px 4px 5px 1px #085f63;
+    overflow: scroll;
 }
 .inner-modal > * {
     margin: 0.5rem;
@@ -107,21 +206,30 @@ body {
 
 }
 .modal-header img {
-    max-height: 500px;
-    width: auto;
+    max-height: 60vh;
+    max-width: 100%;
 }
 .modal-meta {
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
-.modal-meta > * {
+.img-about  > * {
     padding: 5px;
     margin: 0;
+}
+.img-about {
+    display: flex;
+    align-items: center;
+}
 
+.deleteButton:hover {
+    opacity: 0.7;
 }
 
 .post-comment {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .comment-container {
@@ -130,6 +238,8 @@ body {
     flex-direction: column;
     align-items: center;
     overflow: scroll;
+    background: #49beb7;
+    border-radius: 1px;
 }
 .comment-instance {
     background: #e9e4e6;
@@ -144,4 +254,19 @@ body {
 }
 .comment-instance > * {
     margin: 0;
+}
+.comment-instance > p {
+    font-size: 0.7em;
+}
+
+@keyframes loading-line {
+    0% { outline-offset: -9px; }
+    12% { outline-offset: -8px; }
+    25% { outline-offset: -7px; }
+    36% { outline-offset: -6px; }
+    50% { outline-offset: -5px; }
+    62% { outline-offset: -4px; }
+    75% { outline-offset: -3px; }
+    89% { outline-offset: -2px; }
+    100% { outline-offset: -1px; }
 }
